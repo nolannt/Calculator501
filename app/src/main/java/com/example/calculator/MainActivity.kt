@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import com.google.android.material.snackbar.Snackbar
 
 /* Sources
     https://developer.android.com/develop/ui/views/theming/themes
@@ -41,9 +42,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun equalsInput(view: View) {
+        val input = inputView.text.toString()
+
+        if (input.startsWithAny(listOf("+", "-", "*", "/")) ||
+            input.endsWithAny(listOf("+", "-", "*", "/")) ||
+            """[+*/-]{2,}""".toRegex().containsMatchIn(input))
+        {
+            showSnackbar("Oops, Invalid Input!")
+            return
+        }
         outputView.text = calculate()
     }
+    private fun String.startsWithAny(prefixes: List<String>): Boolean {
+        for (prefix in prefixes) {
+            if (this.startsWith(prefix)) {
+                return true
+            }
+        }
+        return false
+    }
 
+    private fun String.endsWithAny(prefixes: List<String>): Boolean {
+        for (prefix in prefixes) {
+            if (this.endsWith(prefix)) {
+                return true
+            }
+        }
+        return false
+    }
 
     //This facilitates the input of numbers
     fun numberInput(view: View) {
@@ -115,49 +141,68 @@ class MainActivity : AppCompatActivity() {
 
     private fun timesDiv(passedList: MutableList<Any>): MutableList<Any> {
         val currentList = mutableListOf<Any>()
-        var refreshIndex = passedList.size
+        var i = 0
 
-        for(i in passedList.indices){
-            if(passedList[i] is Char && i != passedList.lastIndex && i < refreshIndex) {
-                val op = passedList[i]
+        while(i < passedList.size){
+            if(passedList[i] is Char && (passedList[i] == '*' || passedList[i] == '/')) {
                 val prevDigit = passedList[i-1] as Float
+                val op = passedList[i]
                 val nextDigit = passedList[i+1] as Float
 
                 when(op) {
                     '*' -> {
-                        currentList.add(prevDigit * nextDigit)
-                        refreshIndex = i +1
+                        currentList[currentList.size - 1] = prevDigit * nextDigit
+                        i += 2
                     }
                     '/' -> {
-                        currentList.add(prevDigit / nextDigit)
-                        refreshIndex = i +1
+                        if (nextDigit == 0f) {
+                            showSnackbar("Oops, cannot divide by 0")
+                            return mutableListOf()
+                        }else{
+                            currentList[currentList.size - 1] = prevDigit / nextDigit
+                            i += 2
+                        }
+                    }
+                    else -> {
+                        currentList.add(passedList[i])
+                        i++
                     }
                 }
-            }
-
-            if(i > refreshIndex)
+            }else{
                 currentList.add(passedList[i])
+                i++
+            }
         }
 
         return currentList
     }
 
+    fun showSnackbar(message: String) {
+        Snackbar.make(
+            findViewById(android.R.id.content),
+            message,
+            Snackbar.LENGTH_SHORT
+        ).show()
+    }
 
     //converts the text in inputView to float
     private fun digitsOp(): MutableList<Any> {
         val list = mutableListOf<Any>()
         var currentDigit = ""
         for(char in inputView.text) {
-            if(char.isDigit() || char == '.')
+            if(char.isDigit() || char == '.') {
                 currentDigit += char
-            else {
-                list.add(currentDigit.toFloat())
-                currentDigit = ""
+            }else {
+                if (currentDigit != "") {
+                    list.add(currentDigit.toFloat())
+                    currentDigit = ""
+                }
                 list.add(char)
             }
         }
-        if(currentDigit != "")
+        if(currentDigit != "") {
             list.add(currentDigit.toFloat())
+        }
         return list
     }
 }
