@@ -21,9 +21,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         ////////////////////////////////////////
-        //inputView = findViewById(R.id.inputView)
+        inputView = findViewById(R.id.inputView)
         //outputView = findViewById(R.id.outputView)
-            // THESE 2 LINES SOMEHOW CRASH THE ENTIRE APP
+            // outputView SOMEHOW CRASHES THE ENTIRE APP
         ////////////////////////////////////////
     }
 
