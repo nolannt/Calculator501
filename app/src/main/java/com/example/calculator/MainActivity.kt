@@ -11,8 +11,7 @@ import android.widget.TextView
     https://developer.android.com/develop/ui/views/theming/themes
     https://stackoverflow.com/questions/34904895/how-to-make-program-to-calculate-accordingly-to-order-of-operations-in-math-ja
     https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/
-
-
+    https://kotlinlang.org/docs/list-operations.html#binary-search-in-sorted-lists
 */
 
 
@@ -69,8 +68,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    //Helper for equals, it does the maths
-    private fun calculate(): CharSequence? {
+    //Helper for equals, applies the operand helpers in order of operations
+    private fun calculate(): String {
 
         val digitsOp = digitsOp()
         if (digitsOp.isEmpty())
@@ -81,9 +80,31 @@ class MainActivity : AppCompatActivity() {
         if (multDiv.isEmpty())
             return ""
 
-        return ""
+        //then add/subtract
+        val answer = addSub(multDiv)
+        return answer.toString()
+
     }
 
+    private fun addSub(passedList: MutableList<Any>): Float {
+        var answer = passedList[0] as Float
+
+        for(i in passedList.indices) {
+            if(passedList[i] is Char && i != passedList.lastIndex) {
+                val op = passedList[i]
+                val nextDigit = passedList[i + 1] as Float
+                if (op == '+')
+                    answer += nextDigit
+                if (op == '-')
+                    answer -= nextDigit
+            }
+        }
+        return answer
+    }
+
+
+    // iterates through the passed list and calls mult and div while those
+    // operands are in the list first
     private fun multDivCalculate(passedList: MutableList<Any>): MutableList<Any> {
         var list = passedList
         while (list.contains('*') || list.contains('/')) {
@@ -99,17 +120,17 @@ class MainActivity : AppCompatActivity() {
         for(i in passedList.indices){
             if(passedList[i] is Char && i != passedList.lastIndex && i < refreshIndex) {
                 val op = passedList[i]
-                val prevDigit = passedList[i] as Float
-                val nextDigit = passedList[i] as Float
+                val prevDigit = passedList[i-1] as Float
+                val nextDigit = passedList[i+1] as Float
 
                 when(op) {
                     '*' -> {
                         currentList.add(prevDigit * nextDigit)
-                        refreshIndex = i + 1
+                        refreshIndex = i +1
                     }
                     '/' -> {
                         currentList.add(prevDigit / nextDigit)
-                        refreshIndex = i + 1
+                        refreshIndex = i +1
                     }
                 }
             }
