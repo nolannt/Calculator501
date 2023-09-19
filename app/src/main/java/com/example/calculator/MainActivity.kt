@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import com.google.android.material.snackbar.Snackbar
+import java.lang.Math.sqrt
 
 /* Sources
     https://developer.android.com/develop/ui/views/theming/themes
@@ -44,9 +45,10 @@ class MainActivity : AppCompatActivity() {
     fun equalsInput(view: View) {
         val input = inputView.text.toString()
 
-        if (input.startsWithAny(listOf("+", "-", "*", "/")) ||
-            input.endsWithAny(listOf("+", "-", "*", "/")) ||
-            """[+*/-]{2,}""".toRegex().containsMatchIn(input))
+        val startsInvalid = input.startsWithAny(listOf("+", "*", "/")) ||
+                (input.startsWith("-") && input.length == 1)
+        val endsInvalid = input.endsWithAny(listOf("+", "-", "*", "/"))
+        if (startsInvalid || endsInvalid || """[+*/-]{2,}""".toRegex().containsMatchIn(input))
         {
             showSnackbar("Oops, Invalid Input!")
             return
@@ -110,6 +112,13 @@ class MainActivity : AppCompatActivity() {
         val answer = addSub(multDiv)
         return answer.toString()
 
+    }
+
+    fun handleClear(view: View) {
+        inputView.text.clear()
+        outputView.text = "0"
+        canAddOp = false
+        canAddDec = true
     }
 
     private fun addSub(passedList: MutableList<Any>): Float {
@@ -177,6 +186,10 @@ class MainActivity : AppCompatActivity() {
         return currentList
     }
 
+    fun handleSqrt(view: View) {
+        inputView.append("sqrt")
+    }
+
     fun showSnackbar(message: String) {
         Snackbar.make(
             findViewById(android.R.id.content),
@@ -188,21 +201,50 @@ class MainActivity : AppCompatActivity() {
     //converts the text in inputView to float
     private fun digitsOp(): MutableList<Any> {
         val list = mutableListOf<Any>()
-        var currentDigit = ""
-        for(char in inputView.text) {
-            if(char.isDigit() || char == '.') {
-                currentDigit += char
-            }else {
-                if (currentDigit != "") {
-                    list.add(currentDigit.toFloat())
-                    currentDigit = ""
+        var currentToken = ""
+        var index = 0
+
+        if (inputView.text.startsWith("-")) {
+            currentToken += "-"
+            index++
+        }
+
+        while (index < inputView.text.length) {
+            val char = inputView.text[index]
+            if (char.isDigit() || char == '.') {
+                currentToken += char
+                index++
+            } else if (inputView.text.substring(index).startsWith("sqrt")) {
+                if (currentToken.isNotEmpty()) {
+                    list.add(sqrt(currentToken.toDouble()).toFloat())
+                    currentToken = ""
+                }
+                index += 4
+                if (index < inputView.text.length && inputView.text[index] == '(') {
+                    index++
+                }
+                while (index < inputView.text.length && (inputView.text[index].isDigit() || inputView.text[index] == '.')) {
+                    currentToken += inputView.text[index]
+                    index++
+                }
+                if (currentToken.isNotEmpty()) {
+                    list.add(sqrt(currentToken.toDouble()))
+                    currentToken = ""
+                }
+                if(index < inputView.text.length && inputView.text[index] == ')') {
+                    index++
+                }
+            } else {
+                if (currentToken.isNotEmpty()) {
+                    list.add(currentToken.toFloat())
+                    currentToken = ""
                 }
                 list.add(char)
+                index++
             }
         }
-        if(currentDigit != "") {
-            list.add(currentDigit.toFloat())
-        }
+        if (currentToken.isNotEmpty())
+            list.add(currentToken.toFloat())
         return list
     }
 }

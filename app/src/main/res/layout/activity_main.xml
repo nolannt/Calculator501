@@ -20,11 +20,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="30sp"
-            android:text="0"
+            android:text=""
+            android:hint="Please enter here"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/outputView" />
+            app:layout_constraintBottom_toTopOf="@id/outputView"
+            android:digits="0123456789+-*/sqrt"/>
 
         <TextView
             android:id="@+id/outputView"
@@ -37,7 +39,25 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/inputView" />
 
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        style="@style/row">
+
+        <Button
+            style="@style/number"
+            android:text="AC"
+            android:onClick="handleClear"
+            android:backgroundTint="#FFA500"/>
+
+        <Button
+            style="@style/operand"
+            android:text="√"
+            android:onClick="handleSqrt" />
+
+
+    </LinearLayout>
+
     <LinearLayout
         style="@style/row">
 
@@ -103,11 +123,11 @@
 
         <Button
             style="@style/number"
-            android:text="." />
+            android:text="0" />
 
         <Button
             style="@style/number"
-            android:text="0" />
+            android:text="." />
 
         <Button
             style="@style/number"
@@ -120,8 +140,6 @@
             android:text="/" />
 
     </LinearLayout>
-
-
 
 
 
