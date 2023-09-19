@@ -7,6 +7,15 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 
+/* Sources
+    https://developer.android.com/develop/ui/views/theming/themes
+    https://stackoverflow.com/questions/34904895/how-to-make-program-to-calculate-accordingly-to-order-of-operations-in-math-ja
+    https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.collections/-mutable-list/
+
+
+*/
+
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var inputView: EditText
@@ -23,12 +32,19 @@ class MainActivity : AppCompatActivity() {
 
         ////////////////////////////////////////
         inputView = findViewById(R.id.inputView)
-        //outputView = findViewById(R.id.outputView)
+        outputView = findViewById(R.id.outputView)
             // outputView SOMEHOW CRASHES THE ENTIRE APP
+                //UPDATE, figured it out!!!!!!!!!
+                //I tried to test run the app before calling
+                //outputView in any of the funs, which
+                //crashed the app (idk why that works that way)
         ////////////////////////////////////////
     }
 
-    fun equalsInput(view: View) {}
+    fun equalsInput(view: View) {
+        outputView.text = calculate()
+    }
+
 
     //This facilitates the input of numbers
     fun numberInput(view: View) {
@@ -51,5 +67,76 @@ class MainActivity : AppCompatActivity() {
             canAddOp = false
             canAddDec = true
         }
+    }
+
+    //Helper for equals, it does the maths
+    private fun calculate(): CharSequence? {
+
+        val digitsOp = digitsOp()
+        if (digitsOp.isEmpty())
+            return ""
+
+        //multiplication and division first (PEMDAS)
+        val multDiv = multDivCalculate(digitsOp)
+        if (multDiv.isEmpty())
+            return ""
+
+        return ""
+    }
+
+    private fun multDivCalculate(passedList: MutableList<Any>): MutableList<Any> {
+        var list = passedList
+        while (list.contains('*') || list.contains('/')) {
+            list = timesDiv(list)
+        }
+        return list
+    }
+
+    private fun timesDiv(passedList: MutableList<Any>): MutableList<Any> {
+        val currentList = mutableListOf<Any>()
+        var refreshIndex = passedList.size
+
+        for(i in passedList.indices){
+            if(passedList[i] is Char && i != passedList.lastIndex && i < refreshIndex) {
+                val op = passedList[i]
+                val prevDigit = passedList[i] as Float
+                val nextDigit = passedList[i] as Float
+
+                when(op) {
+                    '*' -> {
+                        currentList.add(prevDigit * nextDigit)
+                        refreshIndex = i + 1
+                    }
+                    '/' -> {
+                        currentList.add(prevDigit / nextDigit)
+                        refreshIndex = i + 1
+                    }
+                }
+            }
+
+            if(i > refreshIndex)
+                currentList.add(passedList[i])
+        }
+
+        return currentList
+    }
+
+
+    //converts the text in inputView to float
+    private fun digitsOp(): MutableList<Any> {
+        val list = mutableListOf<Any>()
+        var currentDigit = ""
+        for(char in inputView.text) {
+            if(char.isDigit() || char == '.')
+                currentDigit += char
+            else {
+                list.add(currentDigit.toFloat())
+                currentDigit = ""
+                list.add(char)
+            }
+        }
+        if(currentDigit != "")
+            list.add(currentDigit.toFloat())
+        return list
     }
 }
