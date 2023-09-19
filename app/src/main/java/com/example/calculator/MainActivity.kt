@@ -187,7 +187,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun handleSqrt(view: View) {
-        inputView.append("sqrt")
+        if (inputView.text.isEmpty()) {
+            showSnackbar("Please enter a number before sqrt!")
+        } else {
+            inputView.append("sqrt")
+        }
     }
 
     fun showSnackbar(message: String) {
