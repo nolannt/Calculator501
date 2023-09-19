@@ -12,8 +12,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var inputView: EditText
     private lateinit var outputView: TextView
 
-
+    //prevents user from inputting two operands in a row
     private var canAddOp = false
+    //prevents user from adding more than one dec to a number
     private var canAddDec = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     fun equalsInput(view: View) {}
 
+    //This facilitates the input of numbers
     fun numberInput(view: View) {
         if(view is Button) {
             if (view.text == ".") {
@@ -42,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //This facilitates the input of operands
     fun operandInput(view: View) {
         if(view is Button && canAddOp) {
             inputView.append(view.text)

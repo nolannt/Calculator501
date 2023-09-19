@@ -11,7 +11,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp">
+        android:layout_height="200dp"
+        android:padding="20dp">
 
 
         <EditText
@@ -29,11 +30,12 @@
             android:id="@+id/outputView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="40sp"
             android:text="0"
-            app:layout_constraintTop_toBottomOf="@+id/inputView"
+            android:textSize="40sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/inputView" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
     <LinearLayout
